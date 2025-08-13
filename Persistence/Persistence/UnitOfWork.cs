@@ -1,0 +1,42 @@
+﻿using System;
+using Core.Domain;
+using Core.Repositories;
+using Core;
+using System.Threading.Tasks;
+using Core.Domain.Employees;
+using Persistence.Persistence.Repositories.Employees;
+using Core.Repositories.Employees;
+
+namespace Persistence.Persistence
+{
+    public class UnitOfWork : IUnitOfWork
+    {
+        private readonly ProgramacionOrientadaAObjetosContext _context;
+
+        public UnitOfWork(ProgramacionOrientadaAObjetosContext context)
+        {
+            _context = context;
+            Employees = new EmployeesRepository(_context);
+        }
+
+        #region Entities
+        public IEmployeesRepository Employees { get; set; }
+
+        #endregion
+
+        public int Complete()
+        {
+            return _context.SaveChanges();
+        }
+
+        public Task CompleteAsync()
+        {
+            return _context.SaveChangesAsync();
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
+    }
+}
