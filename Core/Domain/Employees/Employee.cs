@@ -7,7 +7,7 @@ namespace Core.Domain.Employees;
 public class Employee
 {
     [Key]
-    public string Id { get; set; }
+    public required string Id { get; set; }
     public required string Name { get; set; }
     public string? Sexo { get; set; }
     public string? CURP { get; set; }

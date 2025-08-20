@@ -120,9 +120,7 @@ public class EmployeesController : ControllerBase
 
         _unitOfWork.Complete();
 
-        var resource = _mapper.Map<Employee, EmployeeResource>(employee!);
-
-        return Ok(resource);
+        return Ok();
     }
 
     #endregion
