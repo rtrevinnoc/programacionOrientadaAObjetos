@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Persistence.Persistence.EntityConfiguration.Employees;
 using Core.Domain.Employees;
+using Persistence.Persistence.EntityConfiguration.Documents;
+using Core.Domain.Documents;
 
 namespace Persistence.Persistence
 {
@@ -17,6 +19,7 @@ namespace Persistence.Persistence
             #region Models
 
             modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+            modelBuilder.ApplyConfiguration(new DocumentConfiguration());
 
             #endregion
 
@@ -28,6 +31,7 @@ namespace Persistence.Persistence
         #region Entities
 
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Document> Documents { get; set;  }
 
         #endregion
     }

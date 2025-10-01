@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Employees;
 using Core.Repositories.Employees;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Persistence.Repositories.Employees;
 

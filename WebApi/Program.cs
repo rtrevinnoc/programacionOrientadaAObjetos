@@ -27,6 +27,8 @@ builder.Services
         options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
     });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Database Connection String 
 var dbConnection = builder.Configuration.GetConnectionString("MySql");
@@ -57,6 +59,12 @@ builder.Services.AddAutoMapper(expression => expression.AddProfile(new MappingPr
 builder.Services.AddLogging();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 using (var scope = app.Services.CreateScope())
 {

@@ -2,6 +2,8 @@
 using AutoMapper;
 using WebApi.Mapping.Resources.Employees;
 using Core.Domain.Employees;
+using Core.Domain.Documents;
+using WebApi.Mapping.Resources.Documents;
 
 namespace WebApi.Mapping
 {
@@ -15,6 +17,13 @@ namespace WebApi.Mapping
 
             CreateMap<Employee, EmployeeResource>();
             CreateMap<SaveEmployeeResource, Employee>();
+
+            #endregion
+
+            #region Documents
+
+            CreateMap<Document, DocumentResource>();
+            CreateMap<SaveDocumentResource, Document>();
 
             #endregion
 

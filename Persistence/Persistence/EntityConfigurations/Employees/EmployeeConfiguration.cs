@@ -18,6 +18,10 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.Property(c => c.Name)
             .IsRequired();
 
+        builder.HasMany(c => c.Documents)
+            .WithOne(c => c.Owner)
+            .HasForeignKey(c => c.OwnerId);
+
         builder.ToTable("Employees");
     }
 }

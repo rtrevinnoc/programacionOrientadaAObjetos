@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Core.Domain.Documents;
 
 namespace Core.Domain.Employees;
 
@@ -13,4 +14,5 @@ public class Employee
     public string? CURP { get; set; }
     public int? TelefonoCasa { get; set; }
     public string? Correo { get; set; }
+    public List<Document> Documents { get; set; }
 }

@@ -1,11 +1,13 @@
 using System.Reflection;
 using AutoMapper;
 using Core;
+using Core.Domain.Documents;
 using Core.Domain.Employees;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Persistence.Persistence;
+using WebApi.Mapping.Resources.Documents;
 using WebApi.Mapping.Resources.Employees;
 using SystemClaim = System.Security.Claims.ClaimTypes;
 
@@ -121,6 +123,46 @@ public class EmployeesController : ControllerBase
         _unitOfWork.Complete();
 
         return Ok();
+    }
+
+    #endregion
+
+    #region Documents
+
+    [HttpPut("{id}/Document")]
+    [EnableQuery]
+    public IActionResult UploadDocument(string id, IFormFile file)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var employee = _unitOfWork.Employees.Get(id);
+        if (employee == null)
+            return NotFound();
+
+        Document document = new Document
+        {
+            Id = Guid.NewGuid(),
+            OwnerId = employee.Id,
+            MimeType = file.ContentType,
+            Name = file.FileName
+        };
+        // document.Content =
+
+        using (var ms = new MemoryStream())
+        {
+            file.CopyTo(ms);
+            document.Content = ms.ToArray();
+        }
+
+        _unitOfWork.Documents.Add(document);
+        _unitOfWork.Complete();
+
+        document = _unitOfWork.Documents.Get(document.Id);
+
+        var resource = _mapper.Map<Document, DocumentResource>(document);
+
+        return Ok(resource);
     }
 
     #endregion
