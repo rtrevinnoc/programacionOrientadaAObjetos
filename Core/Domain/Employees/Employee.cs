@@ -7,12 +7,19 @@ namespace Core.Domain.Employees;
 
 public class Employee
 {
-    [Key]
-    public required string Id { get; set; }
+    public required Guid Id { get; set; }
     public required string Name { get; set; }
     public string? Sexo { get; set; }
     public string? CURP { get; set; }
     public int? TelefonoCasa { get; set; }
     public string? Correo { get; set; }
     public List<Document> Documents { get; set; }
+    public virtual EmployeeType EmployeeType { get; set; }
+}
+
+public enum EmployeeType
+{
+    Teacher,
+    Prefect,
+    Manager
 }

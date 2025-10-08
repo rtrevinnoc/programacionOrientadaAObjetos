@@ -1,10 +1,7 @@
-using Core.Domain.Employees;
-
 namespace WebApi.Mapping.Resources.Employees;
 
-public class EmployeeResource
+public class TeacherResource
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public EmployeeType EmployeeType { get; set; }
 }

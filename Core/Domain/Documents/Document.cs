@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net.Mime;
 using Core.Domain.Employees;
 
@@ -11,5 +12,5 @@ public class Document
     public byte[] Content { get; set; }
     public string MimeType { get; set; } = MediaTypeNames.Application.Pdf;
     public Employee Owner { get; set; }
-    public string OwnerId { get; set; }
+    public Guid OwnerId { get; set; }
 }

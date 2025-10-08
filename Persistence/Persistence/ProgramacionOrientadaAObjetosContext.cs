@@ -4,6 +4,7 @@ using Persistence.Persistence.EntityConfiguration.Employees;
 using Core.Domain.Employees;
 using Persistence.Persistence.EntityConfiguration.Documents;
 using Core.Domain.Documents;
+using Persistence.Persistence.EntityConfiguration.Teacher;
 
 namespace Persistence.Persistence
 {
@@ -20,6 +21,7 @@ namespace Persistence.Persistence
 
             modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
             modelBuilder.ApplyConfiguration(new DocumentConfiguration());
+            modelBuilder.ApplyConfiguration(new TeacherConfiguration());
 
             #endregion
 
@@ -31,7 +33,8 @@ namespace Persistence.Persistence
         #region Entities
 
         public DbSet<Employee> Employees { get; set; }
-        public DbSet<Document> Documents { get; set;  }
+        public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<Document> Documents { get; set; }
 
         #endregion
     }

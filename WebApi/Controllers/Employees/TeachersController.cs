@@ -1,4 +1,3 @@
-using System.Net.Mime;
 using System.Reflection;
 using AutoMapper;
 using Core;
@@ -12,18 +11,18 @@ using WebApi.Mapping.Resources.Documents;
 using WebApi.Mapping.Resources.Employees;
 using SystemClaim = System.Security.Claims.ClaimTypes;
 
-namespace WebApi.Controllers.Documents;
+namespace WebApi.Controllers.Employees;
 
 [ApiController]
-[Route("Documents")]
-public class DocumentsController : ControllerBase
+[Route("Teachers")]
+public class TeachersController : ControllerBase
 {
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
 
-    public DocumentsController(
+    public TeachersController(
         ProgramacionOrientadaAObjetosContext programacionOrientadaAObjetosContext,
         IMapper mapper
     )
@@ -36,11 +35,11 @@ public class DocumentsController : ControllerBase
 
     [HttpGet]
     [EnableQuery]
-    public IActionResult GetDocuments()
+    public IActionResult GetTeachers()
     {
-        var documents = _unitOfWork.Documents.GetAll().ToList();
+        var teacher = _unitOfWork.Teachers.GetAll().ToList();
 
-        var resource = _mapper.Map<List<Document>, List<DocumentResource>>(documents);
+        var resource = _mapper.Map<List<Teacher>, List<TeacherResource>>(teacher);
 
         return Ok(resource);
     }
@@ -56,37 +55,38 @@ public class DocumentsController : ControllerBase
     //     return Ok(resource);
     // }
 
-    [Produces(MediaTypeNames.Application.Pdf, MediaTypeNames.Image.Jpeg)]
     [HttpGet("{id}")]
     [EnableQuery]
-    public IActionResult GetDocument(Guid id)
+    public IActionResult GetTeacher(string id)
     {
-        var document = _unitOfWork.Documents.Get(id);
-        if (document == null)
+        var teacher = _unitOfWork.Teachers.Get(id);
+        if (teacher == null)
             return NotFound();
 
-        return File(document.Content, document.MimeType);
+        var resource = _mapper.Map<Teacher, TeacherResource>(teacher);
+
+        return Ok(resource);
     }
 
-    // [HttpPost]
-    // [EnableQuery]
-    // public async Task<IActionResult> CreateEmployee([FromBody] SaveEmployeeResource saveEmployeeResource)
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
+    [HttpPost]
+    [EnableQuery]
+    public async Task<IActionResult> CreateTeacher([FromBody] SaveTeacherResource saveTeacherResource)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-    //     var employee = _mapper.Map<SaveEmployeeResource, Employee>(saveEmployeeResource);
+        var teacher = _mapper.Map<SaveTeacherResource, Teacher>(saveTeacherResource);
 
-    //     _unitOfWork.Employees.Add(employee);
+        _unitOfWork.Teachers.Add(teacher);
 
-    //     await _unitOfWork.CompleteAsync();
+        await _unitOfWork.CompleteAsync();
 
-    //     employee = await _unitOfWork.Employees.GetAsync(employee.Id);
+        teacher = await _unitOfWork.Teachers.GetAsync(teacher.Id);
 
-    //     var resource = _mapper.Map<Employee, EmployeeResource>(employee!);
+        var resource = _mapper.Map<Teacher, TeacherResource>(teacher!);
 
-    //     return Ok(resource);
-    // }
+        return Ok(resource);
+    }
 
     // [HttpPut]
     // [EnableQuery]
@@ -123,6 +123,46 @@ public class DocumentsController : ControllerBase
     //     _unitOfWork.Complete();
 
     //     return Ok();
+    // }
+
+    #endregion
+
+    #region Schedule
+
+    // [HttpPut("{id}/Document")]
+    // [EnableQuery]
+    // public IActionResult UploadDocument(string id, IFormFile file)
+    // {
+    //     if (!ModelState.IsValid)
+    //         return BadRequest(ModelState);
+
+    //     var employee = _unitOfWork.Employees.Get(id);
+    //     if (employee == null)
+    //         return NotFound();
+
+    //     Document document = new Document
+    //     {
+    //         Id = Guid.NewGuid(),
+    //         OwnerId = employee.Id,
+    //         MimeType = file.ContentType,
+    //         Name = file.FileName
+    //     };
+    //     // document.Content =
+
+    //     using (var ms = new MemoryStream())
+    //     {
+    //         file.CopyTo(ms);
+    //         document.Content = ms.ToArray();
+    //     }
+
+    //     _unitOfWork.Documents.Add(document);
+    //     _unitOfWork.Complete();
+
+    //     document = _unitOfWork.Documents.Get(document.Id);
+
+    //     var resource = _mapper.Map<Document, DocumentResource>(document);
+
+    //     return Ok(resource);
     // }
 
     #endregion

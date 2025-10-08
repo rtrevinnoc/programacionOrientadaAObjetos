@@ -20,11 +20,13 @@ namespace Persistence.Persistence
         {
             _context = context;
             Employees = new EmployeesRepository(_context);
+            Teachers = new TeachersRepository(_context);
             Documents = new DocumentsRepository(_context);
         }
 
         #region Entities
         public IEmployeesRepository Employees { get; set; }
+        public ITeachersRepository Teachers { get; set; }
         public IDocumentsRepository Documents { get; set; }
 
         #endregion

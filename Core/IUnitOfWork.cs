@@ -14,6 +14,7 @@ namespace Core
         #region Employees
 
         IEmployeesRepository Employees { get; }
+        ITeachersRepository Teachers { get; }
 
         #endregion
 
