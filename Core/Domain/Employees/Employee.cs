@@ -4,13 +4,38 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Core.Domain.Employees;
 
-public class Employee
+public enum AnimalSpecies
+{
+    Bovine = 1,
+    Equine = 2,
+    Caprine = 3
+}
+
+public enum AnimalGender
+{
+    Male = 1,
+    Female = 2
+}
+
+public class Livestock
 {
     [Key]
-    public string Id { get; set; }
-    public required string Name { get; set; }
-    public string? Sexo { get; set; }
-    public string? CURP { get; set; }
-    public int? TelefonoCasa { get; set; }
-    public string? Correo { get; set; }
+    public Guid IdRegistration { get; set; } 
+
+    [Required]
+    public required string ActualRanch { get; set; } 
+
+    [Required]
+    public required string Breed { get; set; } 
+    
+    [Required]
+    public AnimalSpecies Species { get; set; } 
+
+    [Required]
+    public AnimalGender Gender { get; set; } 
+
+    public int Age { get; set; }
+
+    public decimal Weight { get; set; } 
 }
+
