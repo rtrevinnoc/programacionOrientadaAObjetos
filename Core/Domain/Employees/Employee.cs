@@ -2,24 +2,33 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Core.Domain.Documents;
+using Microsoft.OData.Edm;
 
 namespace Core.Domain.Employees;
 
-public class Employee
+public enum VideogamesClasification
 {
-    public required Guid Id { get; set; }
-    public required string Name { get; set; }
-    public string? Sexo { get; set; }
-    public string? CURP { get; set; }
-    public int? TelefonoCasa { get; set; }
-    public string? Correo { get; set; }
-    public List<Document> Documents { get; set; }
-    public virtual EmployeeType EmployeeType { get; set; }
+    Everyone = 1,
+    Teen = 2,
+    Mature = 3
 }
-
-public enum EmployeeType
+public class Videogames
 {
-    Teacher,
-    Prefect,
-    Manager
+    [Key]
+    public Guid IdRegistration { get; set; }
+
+    [Required]
+    public required string Name { get; set; }
+
+    [Required]
+    public required string Gender { get; set; }
+
+    [Required]
+    public VideogamesClasification Clasification { get; set; }
+
+    [Required]
+
+    public Date ReleaseDate { get; set; }
+
+    public decimal Price { get; set; }
 }
