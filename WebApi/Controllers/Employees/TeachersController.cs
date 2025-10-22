@@ -3,12 +3,14 @@ using AutoMapper;
 using Core;
 using Core.Domain.Documents;
 using Core.Domain.Employees;
+using Core.Domain.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Persistence.Persistence;
 using WebApi.Mapping.Resources.Documents;
 using WebApi.Mapping.Resources.Employees;
+using WebApi.Mapping.Resources.Management;
 using SystemClaim = System.Security.Claims.ClaimTypes;
 
 namespace WebApi.Controllers.Employees;
@@ -129,41 +131,52 @@ public class TeachersController : ControllerBase
 
     #region Schedule
 
-    // [HttpPut("{id}/Document")]
-    // [EnableQuery]
-    // public IActionResult UploadDocument(string id, IFormFile file)
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
+    [HttpPut("{id}/Schedule")]
+    [EnableQuery]
+    public async Task<IActionResult> AssignScheduleAsync(string id, [FromBody] SaveScheduleResource saveScheduleResource)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-    //     var employee = _unitOfWork.Employees.Get(id);
-    //     if (employee == null)
-    //         return NotFound();
+        var teacher = _unitOfWork.Teachers.Get(id);
+        if (teacher == null)
+            return NotFound();
 
-    //     Document document = new Document
-    //     {
-    //         Id = Guid.NewGuid(),
-    //         OwnerId = employee.Id,
-    //         MimeType = file.ContentType,
-    //         Name = file.FileName
-    //     };
-    //     // document.Content =
+        var schedule = _mapper.Map<SaveScheduleResource, Schedule>(saveScheduleResource);
+        schedule.TeacherId = teacher.Id;
 
-    //     using (var ms = new MemoryStream())
-    //     {
-    //         file.CopyTo(ms);
-    //         document.Content = ms.ToArray();
-    //     }
+        _unitOfWork.Schedules.Add(schedule);
 
-    //     _unitOfWork.Documents.Add(document);
-    //     _unitOfWork.Complete();
+        await _unitOfWork.CompleteAsync();
 
-    //     document = _unitOfWork.Documents.Get(document.Id);
+        schedule = await _unitOfWork.Schedules.GetAsync(schedule.Id);
 
-    //     var resource = _mapper.Map<Document, DocumentResource>(document);
+        var resource = _mapper.Map<Schedule, ScheduleResource>(schedule!);
 
-    //     return Ok(resource);
-    // }
+        // Document document = new Document
+        // {
+        //     Id = Guid.NewGuid(),
+        //     OwnerId = employee.Id,
+        //     MimeType = file.ContentType,
+        //     Name = file.FileName
+        // };
+        // // document.Content =
+
+        // using (var ms = new MemoryStream())
+        // {
+        //     file.CopyTo(ms);
+        //     document.Content = ms.ToArray();
+        // }
+
+        // _unitOfWork.Documents.Add(document);
+        // _unitOfWork.Complete();
+
+        // document = _unitOfWork.Documents.Get(document.Id);
+
+        // var resource = _mapper.Map<Document, DocumentResource>(document);
+
+        return Ok(resource);
+    }
 
     #endregion
 

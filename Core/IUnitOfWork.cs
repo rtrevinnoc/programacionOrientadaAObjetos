@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Core.Repositories;
 using Core.Repositories.Documents;
 using Core.Repositories.Employees;
+using Core.Repositories.Schedules;
 
 namespace Core
 {
@@ -21,6 +22,12 @@ namespace Core
         #region Documents
 
         IDocumentsRepository Documents { get; }
+
+        #endregion
+
+        #region Management
+
+        ISchedulesRepository Schedules { get; }
 
         #endregion
 

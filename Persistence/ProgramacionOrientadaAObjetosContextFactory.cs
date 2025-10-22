@@ -6,7 +6,7 @@ namespace Persistence
     public class ProgramacionOrientadaAObjetosContextFactory : IDesignTimeDbContextFactory<ProgramacionOrientadaAObjetosContext>
     {
         private const string ConnectionStringDevelopmentMySql =
-            "server=localhost; database=ProgramacionOrientadaAObjetos; user=root; password=PASSWORD";
+            "server=localhost; database=ProgramacionOrientadaAObjetos; user=root; password=Drongo123";
 
         public ProgramacionOrientadaAObjetosContext CreateDbContext(string[] args)
         {

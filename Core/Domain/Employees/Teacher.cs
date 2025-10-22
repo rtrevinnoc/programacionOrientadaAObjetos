@@ -8,6 +8,4 @@ namespace Core.Domain.Employees;
 public class Teacher : Employee
 {
     public List<Schedule> Schedules { get; set; }
-
-    public EmployeeType EmployeeType { get; } = EmployeeType.Teacher;
 }

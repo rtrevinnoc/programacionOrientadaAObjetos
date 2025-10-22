@@ -6,5 +6,4 @@ public class EmployeeResource
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public EmployeeType EmployeeType { get; set; }
 }

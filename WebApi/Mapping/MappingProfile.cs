@@ -4,6 +4,8 @@ using WebApi.Mapping.Resources.Employees;
 using Core.Domain.Employees;
 using Core.Domain.Documents;
 using WebApi.Mapping.Resources.Documents;
+using WebApi.Mapping.Resources.Management;
+using Core.Domain.Management;
 
 namespace WebApi.Mapping
 {
@@ -28,6 +30,11 @@ namespace WebApi.Mapping
             CreateMap<Document, DocumentResource>();
             CreateMap<SaveDocumentResource, Document>();
 
+            #endregion
+
+            #region Management
+            CreateMap<Schedule, ScheduleResource>();
+            CreateMap<SaveScheduleResource, Schedule>();
             #endregion
 
             #endregion

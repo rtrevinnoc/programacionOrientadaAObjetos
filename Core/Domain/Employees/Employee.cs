@@ -14,12 +14,4 @@ public class Employee
     public int? TelefonoCasa { get; set; }
     public string? Correo { get; set; }
     public List<Document> Documents { get; set; }
-    public virtual EmployeeType EmployeeType { get; set; }
-}
-
-public enum EmployeeType
-{
-    Teacher,
-    Prefect,
-    Manager
 }

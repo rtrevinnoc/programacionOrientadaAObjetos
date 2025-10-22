@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Persistence;
 
@@ -10,9 +11,11 @@ using Persistence.Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ProgramacionOrientadaAObjetosContext))]
-    partial class ProgramacionOrientadaAObjetosContextModelSnapshot : ModelSnapshot
+    [Migration("20251015025252_AddLlave")]
+    partial class AddLlave
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,10 +85,15 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<Guid>("LlaveId")
+                        .HasColumnType("char(36)");
+
                     b.Property<int>("Number")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LlaveId");
 
                     b.ToTable("Classroom");
                 });
@@ -111,9 +119,6 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid>("ClassroomId")
-                        .HasColumnType("char(36)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -122,9 +127,6 @@ namespace Persistence.Migrations
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassroomId")
-                        .IsUnique();
 
                     b.HasIndex("PrefectId");
 
@@ -185,21 +187,24 @@ namespace Persistence.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Core.Domain.Management.Llave", b =>
+            modelBuilder.Entity("Core.Domain.Management.Classroom", b =>
                 {
-                    b.HasOne("Core.Domain.Management.Classroom", "Classroom")
-                        .WithOne("Llave")
-                        .HasForeignKey("Core.Domain.Management.Llave", "ClassroomId")
+                    b.HasOne("Core.Domain.Management.Llave", "Llave")
+                        .WithMany()
+                        .HasForeignKey("LlaveId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Llave");
+                });
+
+            modelBuilder.Entity("Core.Domain.Management.Llave", b =>
+                {
                     b.HasOne("Core.Domain.Employees.Prefect", "Prefect")
                         .WithMany("LLaves")
                         .HasForeignKey("PrefectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Classroom");
 
                     b.Navigation("Prefect");
                 });
@@ -247,9 +252,6 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Core.Domain.Management.Classroom", b =>
                 {
-                    b.Navigation("Llave")
-                        .IsRequired();
-
                     b.Navigation("Schedules");
                 });
 

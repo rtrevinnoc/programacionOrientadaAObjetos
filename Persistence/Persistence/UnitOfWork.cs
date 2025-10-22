@@ -9,6 +9,8 @@ using Core.Repositories.Employees;
 using Core.Repositories.Documents;
 using System.Reflection.Metadata;
 using Persistence.Persistence.Repositories.Documents;
+using Persistence.Persistence.Repositories.Schedules;
+using Core.Repositories.Schedules;
 
 namespace Persistence.Persistence
 {
@@ -22,12 +24,14 @@ namespace Persistence.Persistence
             Employees = new EmployeesRepository(_context);
             Teachers = new TeachersRepository(_context);
             Documents = new DocumentsRepository(_context);
+            Schedules = new SchedulesRepository(_context);
         }
 
         #region Entities
         public IEmployeesRepository Employees { get; set; }
         public ITeachersRepository Teachers { get; set; }
         public IDocumentsRepository Documents { get; set; }
+        public ISchedulesRepository Schedules { get; set; }
 
         #endregion
 
