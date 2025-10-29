@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Core.Repositories;
-using Core.Repositories.Employees;
+using Core.Repositories.Livestock;
 
 namespace Core
 {
@@ -12,7 +12,7 @@ namespace Core
 
         #region Employees
 
-        IEmployeesRepository Employees { get; }
+        ILivestockRepository Livestock { get; }
 
         #endregion
 

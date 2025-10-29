@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.Domain.Employees;
+namespace Core.Domain.Livestock;
 
 public enum AnimalSpecies
 {
@@ -17,7 +17,7 @@ public enum AnimalGender
     Female = 2
 }
 
-public class Livestock
+public class Animal
 {
     [Key]
     public Guid IdRegistration { get; set; } 
@@ -31,7 +31,7 @@ public class Livestock
     [Required]
     public AnimalSpecies Species { get; set; } 
 
-    [Required]
+    [Required]  
     public AnimalGender Gender { get; set; } 
 
     public int Age { get; set; }

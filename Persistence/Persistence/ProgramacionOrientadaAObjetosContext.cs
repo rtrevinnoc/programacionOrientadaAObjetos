@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Persistence.EntityConfiguration.Employees;
-using Core.Domain.Employees;
+using Persistence.Persistence.EntityConfiguration.Livestock;
+using Core.Domain.Livestock;
 
 namespace Persistence.Persistence
 {
@@ -16,7 +16,7 @@ namespace Persistence.Persistence
         {
             #region Models
 
-            modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+            modelBuilder.ApplyConfiguration(new AnimalConfiguration());
 
             #endregion
 
@@ -27,7 +27,7 @@ namespace Persistence.Persistence
 
         #region Entities
 
-        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Animal> Animals { get; set; }
 
         #endregion
     }

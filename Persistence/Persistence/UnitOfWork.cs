@@ -3,9 +3,9 @@ using Core.Domain;
 using Core.Repositories;
 using Core;
 using System.Threading.Tasks;
-using Core.Domain.Employees;
-using Persistence.Persistence.Repositories.Employees;
-using Core.Repositories.Employees;
+using Core.Domain.Livestock;
+using Persistence.Persistence.Repositories.Livestock;
+using Core.Repositories.Livestock;
 
 namespace Persistence.Persistence
 {
@@ -16,11 +16,11 @@ namespace Persistence.Persistence
         public UnitOfWork(ProgramacionOrientadaAObjetosContext context)
         {
             _context = context;
-            Employees = new EmployeesRepository(_context);
+            Livestock = new LivestockRepository(_context);
         }
 
         #region Entities
-        public IEmployeesRepository Employees { get; set; }
+        public ILivestockRepository Livestock { get; set; }
 
         #endregion
 
