@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Persistence;
 
@@ -10,9 +11,11 @@ using Persistence.Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ProgramacionOrientadaAObjetosContext))]
-    partial class ProgramacionOrientadaAObjetosContextModelSnapshot : ModelSnapshot
+    [Migration("20251022022048_NullablePrefect")]
+    partial class NullablePrefect
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,21 +163,6 @@ namespace Persistence.Migrations
                     b.ToTable("Schedule");
                 });
 
-            modelBuilder.Entity("Core.Domain.Employees.Manager", b =>
-                {
-                    b.HasBaseType("Core.Domain.Employees.Employee");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.ToTable("Managers", (string)null);
-                });
-
             modelBuilder.Entity("Core.Domain.Employees.Prefect", b =>
                 {
                     b.HasBaseType("Core.Domain.Employees.Employee");
@@ -242,24 +230,6 @@ namespace Persistence.Migrations
                     b.Navigation("Course");
 
                     b.Navigation("Teacher");
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Manager", b =>
-                {
-                    b.HasOne("Core.Domain.Employees.Employee", null)
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Employees.Manager", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Prefect", b =>
-                {
-                    b.HasOne("Core.Domain.Employees.Employee", null)
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Employees.Prefect", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Employees.Teacher", b =>

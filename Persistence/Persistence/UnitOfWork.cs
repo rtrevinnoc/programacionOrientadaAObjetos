@@ -11,6 +11,12 @@ using System.Reflection.Metadata;
 using Persistence.Persistence.Repositories.Documents;
 using Persistence.Persistence.Repositories.Schedules;
 using Core.Repositories.Schedules;
+using Core.Repositories.Courses;
+using Persistence.Persistence.Repositories.Courses;
+using Core.Repositories.Classrooms;
+using Persistence.Persistence.Repositories.Classrooms;
+using Core.Repositories.Llaves;
+using Persistence.Persistence.Repositories.Llaves;
 
 namespace Persistence.Persistence
 {
@@ -25,6 +31,10 @@ namespace Persistence.Persistence
             Teachers = new TeachersRepository(_context);
             Documents = new DocumentsRepository(_context);
             Schedules = new SchedulesRepository(_context);
+            Courses = new CoursesRepository(_context);
+            Classrooms = new ClassroomsRepository(_context);
+            Llaves = new LlavesRepository(_context);
+            Managers = new ManagersRepository(_context);
         }
 
         #region Entities
@@ -32,6 +42,10 @@ namespace Persistence.Persistence
         public ITeachersRepository Teachers { get; set; }
         public IDocumentsRepository Documents { get; set; }
         public ISchedulesRepository Schedules { get; set; }
+        public ICoursesRepository Courses { get; set; }
+        public IClassroomsRepository Classrooms { get; set; }
+        public ILlavesRepository Llaves { get; set; }
+        public IManagersRepository Managers { get; set; }
 
         #endregion
 

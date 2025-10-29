@@ -34,7 +34,17 @@ namespace WebApi.Mapping
 
             #region Management
             CreateMap<Schedule, ScheduleResource>();
-            CreateMap<SaveScheduleResource, Schedule>();
+            CreateMap<SaveScheduleResource, Schedule>()
+                .ForMember(d => d.Duration, o => o.MapFrom(o => TimeSpan.FromSeconds(o.Duration)));
+
+            CreateMap<Course, CourseResource>();
+            CreateMap<SaveCourseResource, Course>();
+
+            CreateMap<Classroom, ClassroomResource>();
+            CreateMap<SaveClassroomResource, Classroom>();
+
+            CreateMap<Llave, LlaveResource>();
+            CreateMap<SaveLlaveResource, Llave>();
             #endregion
 
             #endregion

@@ -133,7 +133,7 @@ public class TeachersController : ControllerBase
 
     [HttpPut("{id}/Schedule")]
     [EnableQuery]
-    public async Task<IActionResult> AssignScheduleAsync(string id, [FromBody] SaveScheduleResource saveScheduleResource)
+    public async Task<IActionResult> AssignScheduleAsync(Guid id, [FromBody] SaveScheduleResource saveScheduleResource)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
