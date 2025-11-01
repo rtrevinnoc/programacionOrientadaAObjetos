@@ -1,7 +1,7 @@
 ﻿using System;
 using AutoMapper;
-using WebApi.Mapping.Resources.Employees;
-using Core.Domain.Employees;
+using WebApi.Mapping.Resources.Livestock;
+using Core.Domain.Livestock;
 
 namespace WebApi.Mapping
 {
@@ -11,16 +11,18 @@ namespace WebApi.Mapping
         {
             #region Domain to API Resource
 
-            #region Employees
-
-            CreateMap<Employee, EmployeeResource>();
-            CreateMap<SaveEmployeeResource, Employee>();
-
-            #endregion
+            CreateMap<Animal, AnimalResource>()
+                .ForMember(dest => dest.Sound, opt => opt.MapFrom(src => src.EmitSound()));
+            CreateMap<Horse, HorseResource>(); 
+            CreateMap<Goat, GoatResource>();
 
             #endregion
 
             #region API Resource to Domain
+
+            CreateMap<SaveHorseResource, Horse>();
+            CreateMap<SaveGoatResource, Goat>();
+
             #region Management
             #endregion
             #endregion
