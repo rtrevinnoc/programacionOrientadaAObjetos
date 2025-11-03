@@ -8,22 +8,26 @@ namespace CartoLogger.Persistence.Configurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<User> table)
+    public void Configure(EntityTypeBuilder<User> modelBuilder)
     {
-        table.HasKey(user => user.Id);
-        table.Property(user => user.Id)
+        modelBuilder.HasKey(user => user.Id);
+        modelBuilder.Property(user => user.Id)
              .ValueGeneratedOnAdd();
 
-        table.Property(user => user.Name)
+        modelBuilder.Property(user => user.Name)
              .IsRequired()
              .HasMaxLength(User.NameConstraints.maxLength);
-        table.HasIndex(user => user.Name)
+
+        modelBuilder.HasIndex(user => user.Name)
              .IsUnique();
 
-        table.Property(user => user.Email)
+
+        modelBuilder.Property(user => user.Email)
              .IsRequired()
              .HasMaxLength(EmailConstaints.maxLength);
-        table.HasIndex(user => user.Email)
-             .IsUnique();  
+
+        modelBuilder.HasIndex(user => user.Email)
+             .IsUnique();
+
     }
 }

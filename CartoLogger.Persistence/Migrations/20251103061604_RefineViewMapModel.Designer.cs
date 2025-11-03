@@ -3,6 +3,7 @@ using CartoLogger.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CartoLogger.Persistence.Migrations
 {
     [DbContext(typeof(CartoLoggerDbContext))]
-    partial class CartoLoggerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251103061604_RefineViewMapModel")]
+    partial class RefineViewMapModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

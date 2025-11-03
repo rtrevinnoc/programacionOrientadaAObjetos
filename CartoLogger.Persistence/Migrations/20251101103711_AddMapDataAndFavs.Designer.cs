@@ -3,6 +3,7 @@ using CartoLogger.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CartoLogger.Persistence.Migrations
 {
     [DbContext(typeof(CartoLoggerDbContext))]
-    partial class CartoLoggerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251101103711_AddMapDataAndFavs")]
+    partial class AddMapDataAndFavs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,19 +123,19 @@ namespace CartoLogger.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CartoLogger.Domain.Entities.UserFavoriteMap", b =>
+            modelBuilder.Entity("MapUser", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("FavoriteMapsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MapId")
+                    b.Property<int>("FavoritedById")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "MapId");
+                    b.HasKey("FavoriteMapsId", "FavoritedById");
 
-                    b.HasIndex("MapId");
+                    b.HasIndex("FavoritedById");
 
-                    b.ToTable("UserFavoriteMaps");
+                    b.ToTable("UserFavoriteMaps", (string)null);
                 });
 
             modelBuilder.Entity("CartoLogger.Domain.Entities.Feature", b =>
@@ -159,14 +162,18 @@ namespace CartoLogger.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.OwnsOne("CartoLogger.Domain.Entities.View", "View", b1 =>
+                    b.OwnsOne("CartoLogger.Domain.Entities.LatLng", "View", b1 =>
                         {
                             b1.Property<int>("MapId")
                                 .HasColumnType("int");
 
-                            b1.Property<double>("Zoom")
+                            b1.Property<double>("Lat")
                                 .HasColumnType("double")
-                                .HasColumnName("ViewZoom");
+                                .HasColumnName("ViewLatitude");
+
+                            b1.Property<double>("Lng")
+                                .HasColumnType("double")
+                                .HasColumnName("ViewCenterLongitude");
 
                             b1.HasKey("MapId");
 
@@ -174,30 +181,6 @@ namespace CartoLogger.Persistence.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("MapId");
-
-                            b1.OwnsOne("CartoLogger.Domain.Entities.LatLng", "Center", b2 =>
-                                {
-                                    b2.Property<int>("ViewMapId")
-                                        .HasColumnType("int");
-
-                                    b2.Property<double>("Lat")
-                                        .HasColumnType("double")
-                                        .HasColumnName("ViewCenterLat");
-
-                                    b2.Property<double>("Lng")
-                                        .HasColumnType("double")
-                                        .HasColumnName("ViewCenterLng");
-
-                                    b2.HasKey("ViewMapId");
-
-                                    b2.ToTable("Maps");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ViewMapId");
-                                });
-
-                            b1.Navigation("Center")
-                                .IsRequired();
                         });
 
                     b.Navigation("User");
@@ -206,36 +189,28 @@ namespace CartoLogger.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CartoLogger.Domain.Entities.UserFavoriteMap", b =>
+            modelBuilder.Entity("MapUser", b =>
                 {
-                    b.HasOne("CartoLogger.Domain.Entities.Map", "Map")
-                        .WithMany("FavoritedBy")
-                        .HasForeignKey("MapId")
+                    b.HasOne("CartoLogger.Domain.Entities.Map", null)
+                        .WithMany()
+                        .HasForeignKey("FavoriteMapsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CartoLogger.Domain.Entities.User", "User")
-                        .WithMany("FavoriteMaps")
-                        .HasForeignKey("UserId")
+                    b.HasOne("CartoLogger.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("FavoritedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Map");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CartoLogger.Domain.Entities.Map", b =>
                 {
-                    b.Navigation("FavoritedBy");
-
                     b.Navigation("Features");
                 });
 
             modelBuilder.Entity("CartoLogger.Domain.Entities.User", b =>
                 {
-                    b.Navigation("FavoriteMaps");
-
                     b.Navigation("Features");
 
                     b.Navigation("Maps");

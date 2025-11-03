@@ -1,13 +1,24 @@
+using CartoLogger.Domain.Interfaces;
+
 namespace CartoLogger.Domain.Entities;
 
-public class Feature
+public enum FeatureType
 {
-    public int Id {get; init;}
-    public required string Data {get; set;}
+    Feature,
+    FeatureCollection
+}
 
-    public int? MapId {get; private set;}
-    public Map? Map {get; init;}
+public class Feature : IEntity
+{
+    public int Id {get; set;}
+    public required FeatureType Type {get; set;}
+    public required string Name {get; set;}
+    public required string Description {get; set;}
+    public required string Geometry {get; set;}
 
-    public int? UserId {get; private set;}
-    public User? User {get; init;}
+    public int? MapId {get; set;}
+    public Map? Map {get; private set;}
+
+    public int? UserId {get; set;}
+    public User? User {get; private set;}
 }

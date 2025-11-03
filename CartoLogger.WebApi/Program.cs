@@ -5,10 +5,6 @@ using CartoLogger.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// OpenApi webapi infomation and statistics
-builder.Services.AddOpenApi();
-builder.Services.AddControllers();
-
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(); 
 
 var connectionString = builder.Configuration.GetConnectionString("MySql");
@@ -19,6 +15,11 @@ builder.Services.AddDbContext<CartoLoggerDbContext>(options => {
         ServerVersion.AutoDetect(connectionString)
     );
 });
+
+
+// OpenApi webapi infomation and statistics
+builder.Services.AddOpenApi();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 

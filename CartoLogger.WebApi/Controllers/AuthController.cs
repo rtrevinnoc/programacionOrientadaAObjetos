@@ -3,21 +3,21 @@ using CartoLogger.Domain;
 using CartoLogger.Domain.Constraints;
 using CartoLogger.Domain.Entities;
 using CartoLogger.WebApi.DTO;
-using CartoLogger.WebApi.DTO.Http;
 
 namespace CartoLogger.WebApi.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(IUnitOfWork unitOfWork) : ControllerBase
+public class AuthController(IUnitOfWork unitOfWork) : CartoLoggerController
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest req)
     {
         Task<User?> task;
-        if (EmailConstaints.IsValidEmail(req.Identity, out string? emailErr))
+        if (EmailConstaints.IsValidEmail(req.Identity, out string? _))
         {
             task = _unitOfWork.Users.GetByEmail(req.Identity);
         }
@@ -27,38 +27,18 @@ public class AuthController(IUnitOfWork unitOfWork) : ControllerBase
         }
 
         User? user = await task;
-        if (user is null)
-        {
-            return Unauthorized(new
-            {
-                error = emailErr ?? "invalid credentials"
-            });
+        if(user is null ||!PasswordConstraints.VerifyPassword(req.Password, user.PasswordHash)
+        ) {
+            return Problem( 
+                title: "Unauthorized",
+                detail: "Invalid credentials",
+                statusCode: StatusCodes.Status401Unauthorized
+            );
         }
 
-        if (!PasswordConstraints.VerifyPassword(req.Password, user.PasswordHash))
-        {
-            return Unauthorized(new { error = "invalid credentials" });
-        }
-
-
-        await _unitOfWork.Users.LoadMaps(user);
-        return Ok(new LoginResponse
-        {
-            User = new UserDto
-            {
-                Id = user.Id,
-                Name = user.Name
-            },
-            Maps = user.Maps.Select(m =>
-                new MapDto
-                {
-                    Id = m.Id,
-                    Title = m.Title,
-                    Description = m.Description
-                }
-            )
-        });
+        return Ok(new { user.Id });
     }
+
 
     [HttpPost("signup")]
     public async Task<IActionResult> SignUp([FromBody] SignUpRequest req)
@@ -66,30 +46,38 @@ public class AuthController(IUnitOfWork unitOfWork) : ControllerBase
 
         if (!EmailConstaints.IsValidEmail(req.Email, out string? emailErr))
         {
-            return BadRequest(new {
-                error = emailErr ?? "invalid email format"
-            });
+            return Problem(
+                title: "Bad email",
+                detail: emailErr ?? "invalid email format",
+                statusCode: StatusCodes.Status400BadRequest
+            );
         }
-
 
         if (!PasswordConstraints.IsValidPassword(req.Password, out string? passErr))
         {
-            return BadRequest(new {
-                error = passErr ?? "password is not strong enough"
-            });
+            return Problem(
+                title: "Bad password",
+                detail: passErr ?? "password is not strong enough",
+                statusCode: StatusCodes.Status400BadRequest
+            );
         }
 
-        var userByName = await _unitOfWork.Users.GetByName(req.Username);
-        if (userByName != null)
+        if (await _unitOfWork.Users.ExistsWithName(req.Username))
         {
-            return Conflict(new { error = "username already in use" });
+            return Problem(
+                title: "Bad password",
+                detail: "username already in use",
+                statusCode: StatusCodes.Status409Conflict
+            );
         }
 
-
-        var userByEmail = await _unitOfWork.Users.GetByEmail(req.Email);
-        if (userByEmail != null)
+        if (await _unitOfWork.Users.ExistsWithEmail(req.Email))
         {
-            return Conflict(new { error = "email is already in use" });
+            return Problem(
+                title: "Bad email",
+                detail: "email is already in use",
+                statusCode: StatusCodes.Status409Conflict
+            );
         }
 
         string passwordHash = PasswordConstraints.HashPassword(req.Password);
@@ -104,10 +92,6 @@ public class AuthController(IUnitOfWork unitOfWork) : ControllerBase
         _unitOfWork.Users.Add(user);
         await _unitOfWork.SaveChangesAsync();
 
-        return Ok(new UserDto
-        {
-            Id = user.Id,
-            Name = user.Name
-        });
+        return NoContent();
     }
 }

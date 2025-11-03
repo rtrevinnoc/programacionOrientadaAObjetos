@@ -14,7 +14,16 @@ public class FeatureConfiguration : IEntityTypeConfiguration<Feature>
         table.Property(feature => feature.Id)
              .ValueGeneratedOnAdd();
 
-        table.Property(feature => feature.Data)
+        table.Property(feature => feature.Type)
+             .IsRequired();
+
+        table.Property(feature => feature.Name)
+             .IsRequired();
+
+        table.Property(feature => feature.Description)
+             .IsRequired();
+        
+        table.Property(feature => feature.Geometry)
              .IsRequired();
 
         table.HasOne(feature => feature.User)

@@ -1,6 +1,8 @@
-﻿namespace CartoLogger.Domain.Entities;
+﻿using CartoLogger.Domain.Interfaces;
 
-public class User
+namespace CartoLogger.Domain.Entities;
+
+public class User : IEntity
 {
     public static class NameConstraints
     {   
@@ -24,6 +26,9 @@ public class User
     public required string Email {get; set;}
     public required string PasswordHash {get; init;}
 
-    public List<Map> Maps {get; private set;} = [];
-    public List<Feature> Features {get; private set;} = [];
+    public ICollection<Map> Maps {get; private set;} = [];
+    public ICollection<Feature> Features {get; private set;} = [];
+
+    //Many to many User<->Maps
+    public ICollection<UserFavoriteMap> FavoriteMaps {get; private set;} = []; 
 }
