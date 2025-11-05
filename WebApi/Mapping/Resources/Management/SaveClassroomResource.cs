@@ -6,8 +6,8 @@ namespace WebApi.Mapping.Resources.Management;
 
 public class SaveClassroomResource
 {
+    public Guid? Id { get; set; }
     public required int Number { get; set; }
-
     public required SaveLlaveResource Llave { get; set; }
 }
 

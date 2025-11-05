@@ -5,11 +5,13 @@ using Core;
 using Core.Domain.Employees;
 using Core.Domain.Management;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Persistence.Persistence;
 using WebApi.Mapping.Resources.Employees;
 using WebApi.Mapping.Resources.Management;
+using WebApi.Models.Helpers.Http;
 using SystemClaim = System.Security.Claims.ClaimTypes;
 
 namespace WebApi.Controllers.Management;
@@ -21,6 +23,7 @@ public class ClassroomController : ControllerBase
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly PasswordHasher<object> _hasher;
 
 
     public ClassroomController(
@@ -30,6 +33,7 @@ public class ClassroomController : ControllerBase
     {
         _unitOfWork = new UnitOfWork(programacionOrientadaAObjetosContext);
         _mapper = mapper;
+        _hasher = new PasswordHasher<object>();
     }
 
     #region CRUD
@@ -47,10 +51,16 @@ public class ClassroomController : ControllerBase
 
     [HttpPost]
     [EnableQuery]
+    [Authorize]
     public async Task<IActionResult> CreateClassroom([FromBody] SaveClassroomResource saveClassroomResource)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
         var classroom = _mapper.Map<SaveClassroomResource, Classroom>(saveClassroomResource);
 
@@ -67,42 +77,57 @@ public class ClassroomController : ControllerBase
         return Ok(resource);
     }
 
-    // [HttpPut]
-    // [EnableQuery]
-    // public IActionResult UpdateEmployee([FromBody] SaveEmployeeResource saveEmployeeResource)
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
+    [HttpPut]
+    [EnableQuery]
+    [Authorize]
+    public IActionResult UpdateClassroom([FromBody] SaveClassroomResource saveClassroomResource)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-    //     var employee = _unitOfWork.Employees.Get(saveEmployeeResource.Id);
-    //     if (employee == null)
-    //         return NotFound();
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
-    //     _mapper.Map(saveEmployeeResource, employee);
+        var classroom = _unitOfWork.Classrooms.Get(saveClassroomResource.Id!.Value);
+        if (classroom == null)
+            return NotFound();
 
-    //     _unitOfWork.Complete();
+        _mapper.Map(saveClassroomResource, classroom);
 
-    //     employee = _unitOfWork.Employees.Get(employee.Id);
+        _unitOfWork.Complete();
 
-    //     var resource = _mapper.Map<Employee, EmployeeResource>(employee!);
+        classroom = _unitOfWork.Classrooms.Get(classroom.Id);
 
-    //     return Ok(resource);
-    // }
+        var resource = _mapper.Map<Classroom, ClassroomResource>(classroom!);
 
-    // [HttpDelete("{id}")]
-    // [EnableQuery]
-    // public IActionResult DeleteEmployee(string id)
-    // {
-    //     var employee = _unitOfWork.Employees.Get(id);
-    //     if (employee == null)
-    //         return NotFound();
+        return Ok(resource);
+    }
 
-    //     _unitOfWork.Employees.Remove(employee);
+    [HttpDelete("{id}")]
+    [EnableQuery]
+    [Authorize]
+    public IActionResult DeleteClassrooom(string id)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-    //     _unitOfWork.Complete();
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
-    //     return Ok();
-    // }
+        var classroom = _unitOfWork.Classrooms.Get(id);
+        if (classroom == null)
+            return NotFound();
+
+        _unitOfWork.Classrooms.Remove(classroom);
+
+        _unitOfWork.Complete();
+
+        return Ok();
+    }
 
     #endregion
 

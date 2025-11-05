@@ -75,6 +75,7 @@ public class TeachersController : ControllerBase
 
     [HttpPost]
     [EnableQuery]
+    [Authorize]
     public async Task<IActionResult> CreateTeacher([FromBody] SaveTeacherResource saveTeacherResource)
     {
         if (!ModelState.IsValid)
@@ -85,7 +86,7 @@ public class TeachersController : ControllerBase
         if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
             return Unauthorized();
 
-        var teacher = _mapper.Map<SaveTeacherResource, Teacher>(saveTeacherResource);
+        var teacher = manager.CreateTeacher(Guid.NewGuid(), saveTeacherResource.Name);
 
         _unitOfWork.Teachers.Add(teacher);
 
@@ -98,42 +99,57 @@ public class TeachersController : ControllerBase
         return Ok(resource);
     }
 
-    // [HttpPut]
-    // [EnableQuery]
-    // public IActionResult UpdateEmployee([FromBody] SaveEmployeeResource saveEmployeeResource)
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
+    [HttpPut]
+    [EnableQuery]
+    [Authorize]
+    public IActionResult UpdateTeacher([FromBody] SaveTeacherResource saveTeacherResource)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
-    //     var employee = _unitOfWork.Employees.Get(saveEmployeeResource.Id);
-    //     if (employee == null)
-    //         return NotFound();
+        var teacher = _unitOfWork.Teachers.Get(saveTeacherResource.Id);
+        if (teacher == null)
+            return NotFound();
 
-    //     _mapper.Map(saveEmployeeResource, employee);
+        _mapper.Map(saveTeacherResource, teacher);
 
-    //     _unitOfWork.Complete();
+        _unitOfWork.Complete();
 
-    //     employee = _unitOfWork.Employees.Get(employee.Id);
+        teacher = _unitOfWork.Teachers.Get(teacher.Id);
 
-    //     var resource = _mapper.Map<Employee, EmployeeResource>(employee!);
+        var resource = _mapper.Map<Teacher, TeacherResource>(teacher!);
 
-    //     return Ok(resource);
-    // }
+        return Ok(resource);
+    }
 
-    // [HttpDelete("{id}")]
-    // [EnableQuery]
-    // public IActionResult DeleteEmployee(string id)
-    // {
-    //     var employee = _unitOfWork.Employees.Get(id);
-    //     if (employee == null)
-    //         return NotFound();
+    [HttpDelete("{id}")]
+    [EnableQuery]
+    [Authorize]
+    public IActionResult DeleteTeacher(string id)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
-    //     _unitOfWork.Employees.Remove(employee);
+        var teacher = _unitOfWork.Teachers.Get(id);
+        if (teacher == null)
+            return NotFound();
 
-    //     _unitOfWork.Complete();
+        _unitOfWork.Teachers.Remove(teacher);
 
-    //     return Ok();
-    // }
+        _unitOfWork.Complete();
+
+        return Ok();
+    }
 
     #endregion
 
@@ -154,10 +170,17 @@ public class TeachersController : ControllerBase
 
         var teacher = _unitOfWork.Teachers.Get(id);
         if (teacher == null)
-            return NotFound();
+            return NotFound("Teacher not found");
 
-        var schedule = _mapper.Map<SaveScheduleResource, Schedule>(saveScheduleResource);
-        schedule.TeacherId = teacher.Id;
+        var course = _unitOfWork.Courses.Get(saveScheduleResource.CourseId);
+        if (course == null)
+            return NotFound("Course not found");
+
+        var classroom = _unitOfWork.Classrooms.Get(saveScheduleResource.ClassroomId);
+        if (classroom == null)
+            return NotFound("Classroom not found");
+
+        var schedule = manager.AssignCourseToTeacher(teacher, course, classroom, saveScheduleResource.Duration);
 
         _unitOfWork.Schedules.Add(schedule);
 
@@ -166,28 +189,6 @@ public class TeachersController : ControllerBase
         schedule = await _unitOfWork.Schedules.GetAsync(schedule.Id);
 
         var resource = _mapper.Map<Schedule, ScheduleResource>(schedule!);
-
-        // Document document = new Document
-        // {
-        //     Id = Guid.NewGuid(),
-        //     OwnerId = employee.Id,
-        //     MimeType = file.ContentType,
-        //     Name = file.FileName
-        // };
-        // // document.Content =
-
-        // using (var ms = new MemoryStream())
-        // {
-        //     file.CopyTo(ms);
-        //     document.Content = ms.ToArray();
-        // }
-
-        // _unitOfWork.Documents.Add(document);
-        // _unitOfWork.Complete();
-
-        // document = _unitOfWork.Documents.Get(document.Id);
-
-        // var resource = _mapper.Map<Document, DocumentResource>(document);
 
         return Ok(resource);
     }

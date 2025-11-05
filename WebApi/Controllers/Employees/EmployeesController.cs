@@ -4,11 +4,13 @@ using Core;
 using Core.Domain.Documents;
 using Core.Domain.Employees;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Persistence.Persistence;
 using WebApi.Mapping.Resources.Documents;
 using WebApi.Mapping.Resources.Employees;
+using WebApi.Models.Helpers.Http;
 using SystemClaim = System.Security.Claims.ClaimTypes;
 
 namespace WebApi.Controllers.Employees;
@@ -20,6 +22,7 @@ public class EmployeesController : ControllerBase
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly PasswordHasher<object> _hasher;
 
 
     public EmployeesController(
@@ -29,6 +32,7 @@ public class EmployeesController : ControllerBase
     {
         _unitOfWork = new UnitOfWork(programacionOrientadaAObjetosContext);
         _mapper = mapper;
+        _hasher = new PasswordHasher<object>();
     }
 
     #region CRUD
@@ -70,10 +74,16 @@ public class EmployeesController : ControllerBase
 
     [HttpPost]
     [EnableQuery]
+    [Authorize]
     public async Task<IActionResult> CreateEmployee([FromBody] SaveEmployeeResource saveEmployeeResource)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
         var employee = _mapper.Map<SaveEmployeeResource, Employee>(saveEmployeeResource);
 
@@ -90,8 +100,17 @@ public class EmployeesController : ControllerBase
 
     [HttpPut]
     [EnableQuery]
+    [Authorize]
     public IActionResult UpdateEmployee([FromBody] SaveEmployeeResource saveEmployeeResource)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
+
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
@@ -112,8 +131,17 @@ public class EmployeesController : ControllerBase
 
     [HttpDelete("{id}")]
     [EnableQuery]
+    [Authorize]
     public IActionResult DeleteEmployee(string id)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
+
         var employee = _unitOfWork.Employees.Get(id);
         if (employee == null)
             return NotFound();
@@ -131,29 +159,22 @@ public class EmployeesController : ControllerBase
 
     [HttpPut("{id}/Document")]
     [EnableQuery]
+    [Authorize]
     public IActionResult UploadDocument(string id, IFormFile file)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
         var employee = _unitOfWork.Employees.Get(id);
         if (employee == null)
             return NotFound();
 
-        Document document = new Document
-        {
-            Id = Guid.NewGuid(),
-            OwnerId = employee.Id,
-            MimeType = file.ContentType,
-            Name = file.FileName
-        };
-        // document.Content =
-
-        using (var ms = new MemoryStream())
-        {
-            file.CopyTo(ms);
-            document.Content = ms.ToArray();
-        }
+        Document document = manager.AssignDocumentToEmployee(employee, file);
 
         _unitOfWork.Documents.Add(document);
         _unitOfWork.Complete();

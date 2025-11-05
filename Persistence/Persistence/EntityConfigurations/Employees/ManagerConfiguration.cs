@@ -10,6 +10,8 @@ public class ManagerConfiguration : IEntityTypeConfiguration<Core.Domain.Employe
 {
     public void Configure(EntityTypeBuilder<Core.Domain.Employees.Manager> builder)
     {
+        builder.Ignore(c => c.hasher);
+
         builder.ToTable("Managers");
     }
 }

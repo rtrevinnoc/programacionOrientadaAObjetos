@@ -12,6 +12,7 @@ using Persistence.Persistence;
 using WebApi.Mapping.Resources.Documents;
 using WebApi.Mapping.Resources.Employees;
 using WebApi.Mapping.Resources.Management;
+using WebApi.Models.Helpers.Http;
 using SystemClaim = System.Security.Claims.ClaimTypes;
 
 namespace WebApi.Controllers.Employees;
@@ -64,23 +65,26 @@ public class ManagersController : ControllerBase
 
     [HttpPost]
     [EnableQuery]
+    [Authorize]
     public async Task<IActionResult> CreateManager([FromBody] SaveManagerResource saveManagerResource)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var manager = _mapper.Map<SaveManagerResource, Manager>(saveManagerResource);
-        manager.Name = saveManagerResource.Name;
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
-        manager.Password = _hasher.HashPassword(null, saveManagerResource.Password);
+        var newManager = manager.AssignNewManager(saveManagerResource.Name, saveManagerResource.Username, saveManagerResource.Password);
 
-        _unitOfWork.Managers.Add(manager);
+        _unitOfWork.Managers.Add(newManager);
 
         await _unitOfWork.CompleteAsync();
 
-        manager = await _unitOfWork.Managers.GetAsync(manager.Id);
+        newManager = await _unitOfWork.Managers.GetAsync(newManager.Id);
 
-        var resource = _mapper.Map<Manager, ManagerResource>(manager!);
+        var resource = _mapper.Map<Manager, ManagerResource>(newManager!);
 
         return Ok(resource);
     }

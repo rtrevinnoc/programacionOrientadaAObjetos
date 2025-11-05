@@ -7,5 +7,10 @@ namespace Core.Domain.Employees;
 
 public class Teacher : Employee
 {
+    public Teacher() : base()
+    {
+        Schedules = new List<Schedule>();
+    }
+
     public List<Schedule> Schedules { get; set; }
 }
