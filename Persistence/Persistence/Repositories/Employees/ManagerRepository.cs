@@ -14,4 +14,10 @@ public class ManagersRepository : Repository<Manager>, IManagersRepository
     }
 
     private ProgramacionOrientadaAObjetosContext ProgramacionOrientadaAObjetosContext => Context;
+
+    public Manager GetManagerByUsername(string username)
+    {
+        var managers = ProgramacionOrientadaAObjetosContext.Managers.Where(m => m.Username == username);
+        return managers.Single();
+    }
 }

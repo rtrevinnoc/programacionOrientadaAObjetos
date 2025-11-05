@@ -23,6 +23,10 @@ namespace WebApi.Mapping
             CreateMap<Teacher, TeacherResource>();
             CreateMap<SaveTeacherResource, Teacher>();
 
+            CreateMap<Manager, ManagerResource>();
+            CreateMap<SaveManagerResource, Manager>();
+            CreateMap<SaveManagerResource, Employee>();
+
             #endregion
 
             #region Documents

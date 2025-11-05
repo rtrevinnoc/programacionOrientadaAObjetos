@@ -5,6 +5,7 @@ using Core.Domain.Documents;
 using Core.Domain.Employees;
 using Core.Domain.Management;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Persistence.Persistence;
@@ -22,6 +23,7 @@ public class ManagersController : ControllerBase
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly PasswordHasher<object> _hasher;
 
 
     public ManagersController(
@@ -31,6 +33,7 @@ public class ManagersController : ControllerBase
     {
         _unitOfWork = new UnitOfWork(programacionOrientadaAObjetosContext);
         _mapper = mapper;
+        _hasher = new PasswordHasher<object>();
     }
 
     #region CRUD
@@ -61,22 +64,26 @@ public class ManagersController : ControllerBase
 
     [HttpPost]
     [EnableQuery]
-    public async Task<IActionResult> CreateTeacher([FromBody] SaveTeacherResource saveTeacherResource)
+    public async Task<IActionResult> CreateManager([FromBody] SaveManagerResource saveManagerResource)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var teacher = _mapper.Map<SaveTeacherResource, Teacher>(saveTeacherResource);
+        var manager = _mapper.Map<SaveManagerResource, Manager>(saveManagerResource);
+        manager.Name = saveManagerResource.Name;
 
-        _unitOfWork.Teachers.Add(teacher);
+        manager.Password = _hasher.HashPassword(null, saveManagerResource.Password);
+
+        _unitOfWork.Managers.Add(manager);
 
         await _unitOfWork.CompleteAsync();
 
-        teacher = await _unitOfWork.Teachers.GetAsync(teacher.Id);
+        manager = await _unitOfWork.Managers.GetAsync(manager.Id);
 
-        var resource = _mapper.Map<Teacher, TeacherResource>(teacher!);
+        var resource = _mapper.Map<Manager, ManagerResource>(manager!);
 
         return Ok(resource);
     }
 
+    #endregion
 }

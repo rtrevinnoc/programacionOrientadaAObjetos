@@ -5,12 +5,14 @@ using Core.Domain.Documents;
 using Core.Domain.Employees;
 using Core.Domain.Management;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Persistence.Persistence;
 using WebApi.Mapping.Resources.Documents;
 using WebApi.Mapping.Resources.Employees;
 using WebApi.Mapping.Resources.Management;
+using WebApi.Models.Helpers.Http;
 using SystemClaim = System.Security.Claims.ClaimTypes;
 
 namespace WebApi.Controllers.Employees;
@@ -22,7 +24,7 @@ public class TeachersController : ControllerBase
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-
+    private readonly PasswordHasher<object> _hasher;
 
     public TeachersController(
         ProgramacionOrientadaAObjetosContext programacionOrientadaAObjetosContext,
@@ -31,6 +33,7 @@ public class TeachersController : ControllerBase
     {
         _unitOfWork = new UnitOfWork(programacionOrientadaAObjetosContext);
         _mapper = mapper;
+        _hasher = new PasswordHasher<object>();
     }
 
     #region CRUD
@@ -76,6 +79,11 @@ public class TeachersController : ControllerBase
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
         var teacher = _mapper.Map<SaveTeacherResource, Teacher>(saveTeacherResource);
 
@@ -133,10 +141,16 @@ public class TeachersController : ControllerBase
 
     [HttpPut("{id}/Schedule")]
     [EnableQuery]
+    [Authorize]
     public async Task<IActionResult> AssignScheduleAsync(Guid id, [FromBody] SaveScheduleResource saveScheduleResource)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
         var teacher = _unitOfWork.Teachers.Get(id);
         if (teacher == null)
