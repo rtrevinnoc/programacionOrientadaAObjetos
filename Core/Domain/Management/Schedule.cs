@@ -10,6 +10,10 @@ public class Schedule
 {
     public required Guid Id { get; set; }
     public required TimeSpan Duration { get; set; }
-    public required Class Class { get; set; }
-    public required Guid ClassId { get; set; }
+    public required Teacher Teacher { get; set; }
+    public required Guid TeacherId { get; set; }
+    public required Course Course { get; set; }
+    public required Guid CourseId { get; set; }
+    public required Classroom Classroom { get; set; }
+    public required Guid ClassroomId { get; set; }
 }
