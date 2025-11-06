@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Core.Repositories;
+using Core.Repositories; // <-- El 'using' para IRepository
+using Microsoft.EntityFrameworkCore; // <-- El 'using' para EntityFramework
+using Persistence.Persistence; // <-- El 'using' para tu Context
 
 namespace Persistence.Persistence.Repositories
 {
+    // Implementa la interfaz IRepository<TEntity>
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        protected readonly ProgramacionOrientadaAObjetosContext Context;
+        // Tu variable de Contexto
+        protected readonly ProgramacionOrientadaAObjetosContext Context; 
 
         public Repository(ProgramacionOrientadaAObjetosContext context)
         {
             Context = context;
         }
+
+        // --- Implementación de todos los métodos de tu interfaz ---
 
         public TEntity Get(Guid id)
         {
@@ -47,9 +52,22 @@ namespace Persistence.Persistence.Repositories
             return Context.Set<TEntity>().ToList();
         }
 
+        // Coincide con tu interfaz (Task<List<TEntity>>)
+        public async Task<List<TEntity>> GetAllAsync()
+        {
+            return await Context.Set<TEntity>().ToListAsync();
+        }
+
         public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return Context.Set<TEntity>().Where(predicate);
+            // Añadido .ToList() para que coincida con el comportamiento síncrono
+            return Context.Set<TEntity>().Where(predicate).ToList(); 
+        }
+        
+        // --- ESTE ES UNO DE LOS QUE FALTABA ---
+        public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await Context.Set<TEntity>().Where(predicate).ToListAsync();
         }
 
         public TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
@@ -57,11 +75,18 @@ namespace Persistence.Persistence.Repositories
             return Context.Set<TEntity>().SingleOrDefault(predicate);
         }
 
+        // --- ESTE TAMBIÉN FALTABA ---
+        public async Task AddAsync(TEntity entity)
+        {
+            await Context.Set<TEntity>().AddAsync(entity);
+        }
+
         public void Add(TEntity entity)
         {
             Context.Set<TEntity>().Add(entity);
         }
 
+        // Coincide con tu interfaz (void AddRange)
         public void AddRange(IEnumerable<TEntity> entities)
         {
             Context.Set<TEntity>().AddRange(entities);
@@ -75,11 +100,6 @@ namespace Persistence.Persistence.Repositories
         public void RemoveRange(IEnumerable<TEntity> entities)
         {
             Context.Set<TEntity>().RemoveRange(entities);
-        }
-
-        public Task<List<TEntity>> GetAllAsync()
-        {
-            return Context.Set<TEntity>().ToListAsync();
         }
     }
 }

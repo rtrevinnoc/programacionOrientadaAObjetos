@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Persistence;
 
@@ -10,9 +11,11 @@ using Persistence.Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ProgramacionOrientadaAObjetosContext))]
-    partial class ProgramacionOrientadaAObjetosContextModelSnapshot : ModelSnapshot
+    [Migration("20251106025414_AddRancher")]
+    partial class AddRancher
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,12 +99,7 @@ namespace Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<Guid>("RancherId")
-                        .HasColumnType("char(36)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("RancherId");
 
                     b.ToTable("Ranches", (string)null);
                 });
@@ -234,17 +232,6 @@ namespace Persistence.Migrations
                     b.Navigation("Specie");
                 });
 
-            modelBuilder.Entity("Core.Domain.Locations.Ranch", b =>
-                {
-                    b.HasOne("Core.Domain.People.Rancher", "Rancher")
-                        .WithMany("Ranches")
-                        .HasForeignKey("RancherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rancher");
-                });
-
             modelBuilder.Entity("Core.Domain.Taxonomy.Breed", b =>
                 {
                     b.HasOne("Core.Domain.Taxonomy.Specie", "Specie")
@@ -282,11 +269,6 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Core.Domain.Locations.Ranch", b =>
                 {
                     b.Navigation("Animals");
-                });
-
-            modelBuilder.Entity("Core.Domain.People.Rancher", b =>
-                {
-                    b.Navigation("Ranches");
                 });
 
             modelBuilder.Entity("Core.Domain.Taxonomy.Specie", b =>

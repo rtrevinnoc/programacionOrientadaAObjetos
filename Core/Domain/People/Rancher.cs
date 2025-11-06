@@ -1,11 +1,14 @@
 using System;
 using Microsoft.AspNetCore.Identity;
 using System.Diagnostics.CodeAnalysis;
+using Core.Domain.Locations;
+using System.Collections.Generic;
 
 namespace Core.Domain.People
 {
     public class Rancher
     {
+        public List<Ranch> Ranches { get; set; } = new();
         public Guid Id { get; set; }
         public required string Name { get; set; }
         public required string Username { get; set; }
