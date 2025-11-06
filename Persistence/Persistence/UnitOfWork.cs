@@ -1,11 +1,14 @@
 ﻿using System;
-using Core.Domain;
-using Core.Repositories;
-using Core;
 using System.Threading.Tasks;
-using Core.Domain.Livestock;
-using Persistence.Persistence.Repositories.Livestock;
+using Core;
 using Core.Repositories.Livestock;
+using Core.Repositories.Locations;
+using Core.Repositories.People;
+using Core.Repositories.Taxonomy;
+using Persistence.Persistence.Repositories.Livestock;
+using Persistence.Persistence.Repositories.Locations;
+using Persistence.Persistence.Repositories.People;
+using Persistence.Persistence.Repositories.Taxonomy; 
 
 namespace Persistence.Persistence
 {
@@ -13,25 +16,33 @@ namespace Persistence.Persistence
     {
         private readonly ProgramacionOrientadaAObjetosContext _context;
 
+        public ILivestockRepository Livestock { get; }
+        public ISpecieRepository Species { get; }
+        public IBreedRepository Breeds { get; }
+        public IRanchRepository Ranches { get; }
+        public IRancherRepository Ranchers { get; }
+        public ICorralRepository Corrals { get; }
+
         public UnitOfWork(ProgramacionOrientadaAObjetosContext context)
         {
             _context = context;
+
             Livestock = new LivestockRepository(_context);
+            Species = new SpecieRepository(_context);
+            Breeds = new BreedRepository(_context);
+            Ranches = new RanchRepository(_context);
+            Ranchers = new RancherRepository(_context);
+            Corrals = new CorralRepository(_context);
         }
-
-        #region Entities
-        public ILivestockRepository Livestock { get; set; }
-
-        #endregion
 
         public int Complete()
         {
             return _context.SaveChanges();
         }
 
-        public Task CompleteAsync()
+        public async Task CompleteAsync()
         {
-            return _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         public void Dispose()

@@ -5,6 +5,9 @@ using Core.Domain.Livestock;
 using Core.Domain.Locations;
 using Core.Domain.Taxonomy;
 using Persistence.Persistence.EntityConfigurations.Taxonomy;
+using Persistence.Persistence.EntityConfigurations.Locations;
+using Persistence.Persistence.EntityConfigurations.People;
+using Core.Domain.People;
 
 namespace Persistence.Persistence
 {
@@ -21,6 +24,10 @@ namespace Persistence.Persistence
 
             modelBuilder.ApplyConfiguration(new AnimalConfiguration());
             modelBuilder.ApplyConfiguration(new BreedConfiguration());
+            modelBuilder.ApplyConfiguration(new SpecieConfiguration());
+            modelBuilder.ApplyConfiguration(new RanchConfiguration());
+            modelBuilder.ApplyConfiguration(new RancherConfiguration());
+            modelBuilder.ApplyConfiguration(new CorralConfiguration());
             modelBuilder.Entity<Animal>().UseTptMappingStrategy();
 
             #endregion
@@ -36,6 +43,8 @@ namespace Persistence.Persistence
         public DbSet<Horse> Horses { get; set; }
         public DbSet<Goat> Goats { get; set; }
         public DbSet<Ranch> Ranches { get; set; }
+        public DbSet<Corral> Corrals { get; set; }
+        public DbSet<Rancher> Ranchers { get; set; }
         public DbSet<Specie> Species { get; set; }
         public DbSet<Breed> Breeds { get; set; }
         #endregion

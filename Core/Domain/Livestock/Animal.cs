@@ -37,6 +37,8 @@ public abstract class Animal
     {
         IdSpecie = idSpecie;
     }
+    public Guid? CorralId { get; set; }
+    public Core.Domain.Locations.Corral? Corral { get; set; }
     public abstract string EmitSound();
 }
 

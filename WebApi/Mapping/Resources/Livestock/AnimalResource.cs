@@ -9,5 +9,5 @@ public class AnimalResource
     public int Gender { get; set; }
     public int Age { get; set; }
     public decimal Weight { get; set; }
-    public string? Sound { get; set; }
+    public string? EmitSound { get; set; }
 }

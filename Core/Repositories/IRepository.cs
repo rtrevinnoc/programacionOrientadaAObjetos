@@ -16,6 +16,8 @@ namespace Core.Repositories
         IEnumerable<TEntity> GetAll();
         Task<List<TEntity>> GetAllAsync();
         IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
+        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
+        Task AddAsync(TEntity entity);
 
         // This method was not in the videos, but I thought it would be useful to add.
         TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate);

@@ -2,22 +2,30 @@
 using System.Threading.Tasks;
 using Core.Repositories;
 using Core.Repositories.Livestock;
+using Core.Repositories.Locations;
+using Core.Repositories.People;
+using Core.Repositories.Taxonomy;
 
 namespace Core
 {
     public interface IUnitOfWork : IDisposable
     {
-        #region Management
+        #region Livestock
+        ILivestockRepository Livestock { get; }
         #endregion
 
-        #region Employees
+        #region Taxonomy
+        ISpecieRepository Species { get; }
+        IBreedRepository Breeds { get; }
+        #endregion
 
-        ILivestockRepository Livestock { get; }
-
+        #region Locations
+        IRanchRepository Ranches { get; }
+        IRancherRepository Ranchers { get; }
+        ICorralRepository Corrals { get; }
         #endregion
 
         int Complete();
-
         Task CompleteAsync();
     }
 }

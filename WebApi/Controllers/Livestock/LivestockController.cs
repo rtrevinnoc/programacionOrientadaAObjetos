@@ -162,4 +162,38 @@ public class LivestockController : ControllerBase
     }
 
     #endregion
+
+    #region Business Logic
+
+    [HttpPut("{animalId}/AssignCorral")]
+    [EnableQuery]
+    public async Task<IActionResult> AssignCorral(Guid animalId, [FromBody] WebApi.Mapping.Resources.Locations.AssignCorralResource assignResource)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var animal = await _unitOfWork.Livestock.GetAsync(animalId);
+        if (animal == null)
+            return NotFound("Animal no encontrado.");
+
+        var corral = await _unitOfWork.Corrals.GetAsync(assignResource.CorralId);
+        if (corral == null)
+            return NotFound("Corral no encontrado.");
+
+
+        var animalsInCorral = await _unitOfWork.Livestock.FindAsync(a => a.CorralId == corral.IdCorral);
+        if (animalsInCorral.Count() >= corral.Capacity)
+        {
+            return BadRequest("El corral esta lleno. No se puede asignar el animal.");
+        }
+
+        animal.CorralId = corral.IdCorral;
+
+        await _unitOfWork.CompleteAsync();
+
+        var animalResource = _mapper.Map<Animal, AnimalResource>(animal);
+        return Ok(animalResource);
+    }
+
+    #endregion
 }
