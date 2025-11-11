@@ -10,6 +10,7 @@ using WebApi.Models.Helpers.DateTimes;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,13 +51,21 @@ builder.Services.AddCors(options =>
 });
 
 // builder.Services.AddCors();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Mapping Services
 builder.Services.AddAutoMapper(expression => expression.AddProfile(new MappingProfile()));
 
 builder.Services.AddLogging();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
 
 using (var scope = app.Services.CreateScope())
 {

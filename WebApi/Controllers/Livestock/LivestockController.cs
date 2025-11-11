@@ -19,12 +19,9 @@ public class LivestockController : ControllerBase
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public LivestockController(
-        ProgramacionOrientadaAObjetosContext programacionOrientadaAObjetosContext,
-        IMapper mapper
-    )
+    public LivestockController(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _unitOfWork = new UnitOfWork(programacionOrientadaAObjetosContext);
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 

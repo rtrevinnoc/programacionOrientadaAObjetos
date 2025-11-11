@@ -4,7 +4,10 @@ namespace WebApi.Mapping.Resources.Locations
 {
     public class SaveCorralResource
     {
-        public Guid? Id { get; set; }
+        //public Guid CorralId { get; set; }
+
+        [Required]
+        public Guid RanchId { get; set; }
 
         [Required]
         [StringLength(100)]

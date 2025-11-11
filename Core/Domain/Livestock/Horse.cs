@@ -1,12 +1,16 @@
+using System;
+
 namespace Core.Domain.Livestock;
 
 public class Horse : Animal
 {
-    public const int SPECIES_ID = 1;
-    public decimal MaxSpeed { get; set; }
+    public static readonly Guid SPECIES_ID = Guid.Parse("01");
+
+    public int Speed { get; set; }
 
     public Horse() : base(SPECIES_ID)
     {
     }
-    public override string EmitSound() => "Relincho hiiiihiii";
+
+    public override string EmitSound() => "Relincho hiiiiii";
 }

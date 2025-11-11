@@ -14,7 +14,9 @@ namespace Persistence.Persistence.EntityConfigurations.People
             builder.Property(r => r.Username).IsRequired().HasMaxLength(50);
             builder.HasIndex(r => r.Username).IsUnique();
 
-            builder.Property(r => r.PasswordHash).IsRequired();
+            builder.Property(b => b.Password)
+                    .IsRequired()
+                    .HasMaxLength(100);
         }
     }
 }

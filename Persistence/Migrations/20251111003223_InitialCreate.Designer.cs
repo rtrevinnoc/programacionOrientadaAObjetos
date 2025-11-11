@@ -11,8 +11,8 @@ using Persistence.Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ProgramacionOrientadaAObjetosContext))]
-    [Migration("20251106030015_AddedRancherAndRelationshipToRanch")]
-    partial class AddedRancherAndRelationshipToRanch
+    [Migration("20251111003223_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,14 +37,14 @@ namespace Persistence.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IdBreed")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("IdBreed")
+                        .HasColumnType("char(36)");
 
-                    b.Property<int>("IdRanch")
-                        .HasColumnType("int");
+                    b.Property<Guid>("IdRanch")
+                        .HasColumnType("char(36)");
 
-                    b.Property<int>("IdSpecie")
-                        .HasColumnType("int");
+                    b.Property<Guid>("IdSpecie")
+                        .HasColumnType("char(36)");
 
                     b.Property<decimal>("Weight")
                         .HasColumnType("decimal(65,30)");
@@ -78,16 +78,21 @@ namespace Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<Guid>("RanchId")
+                        .HasColumnType("char(36)");
+
                     b.HasKey("IdCorral");
+
+                    b.HasIndex("RanchId");
 
                     b.ToTable("Corrals");
                 });
 
             modelBuilder.Entity("Core.Domain.Locations.Ranch", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -120,9 +125,10 @@ namespace Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -139,20 +145,17 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Core.Domain.Taxonomy.Breed", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<int>("SpecieId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SpecieId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -163,26 +166,18 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Core.Domain.Taxonomy.Specie", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("CommonName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("ScientificName")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ScientificName")
-                        .IsUnique();
-
-                    b.ToTable("Species", (string)null);
+                    b.ToTable("Species");
                 });
 
             modelBuilder.Entity("Core.Domain.Livestock.Goat", b =>
@@ -199,8 +194,8 @@ namespace Persistence.Migrations
                 {
                     b.HasBaseType("Core.Domain.Livestock.Animal");
 
-                    b.Property<decimal>("MaxSpeed")
-                        .HasColumnType("decimal(65,30)");
+                    b.Property<int>("Speed")
+                        .HasColumnType("int");
 
                     b.ToTable("Horses");
                 });
@@ -212,9 +207,8 @@ namespace Persistence.Migrations
                         .HasForeignKey("CorralId");
 
                     b.HasOne("Core.Domain.Taxonomy.Breed", "Breed")
-                        .WithMany()
-                        .HasForeignKey("IdBreed")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany("Animals")
+                        .HasForeignKey("IdBreed");
 
                     b.HasOne("Core.Domain.Locations.Ranch", "Ranch")
                         .WithMany("Animals")
@@ -223,9 +217,9 @@ namespace Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Taxonomy.Specie", "Specie")
-                        .WithMany("Animals")
+                        .WithMany()
                         .HasForeignKey("IdSpecie")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Breed");
@@ -235,6 +229,17 @@ namespace Persistence.Migrations
                     b.Navigation("Ranch");
 
                     b.Navigation("Specie");
+                });
+
+            modelBuilder.Entity("Core.Domain.Locations.Corral", b =>
+                {
+                    b.HasOne("Core.Domain.Locations.Ranch", "Ranch")
+                        .WithMany()
+                        .HasForeignKey("RanchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ranch");
                 });
 
             modelBuilder.Entity("Core.Domain.Locations.Ranch", b =>
@@ -292,10 +297,13 @@ namespace Persistence.Migrations
                     b.Navigation("Ranches");
                 });
 
-            modelBuilder.Entity("Core.Domain.Taxonomy.Specie", b =>
+            modelBuilder.Entity("Core.Domain.Taxonomy.Breed", b =>
                 {
                     b.Navigation("Animals");
+                });
 
+            modelBuilder.Entity("Core.Domain.Taxonomy.Specie", b =>
+                {
                     b.Navigation("Breeds");
                 });
 #pragma warning restore 612, 618

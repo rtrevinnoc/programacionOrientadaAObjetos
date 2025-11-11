@@ -20,6 +20,11 @@ namespace Persistence.Persistence.EntityConfigurations.Locations
             builder.HasMany(c => c.Animals)
                 .WithOne(a => a.Corral)
                 .HasForeignKey(a => a.CorralId);
+
+
+            builder.HasOne(c => c.Ranch)
+                .WithMany()
+                .HasForeignKey(c => c.RanchId);
         }
     }
 }

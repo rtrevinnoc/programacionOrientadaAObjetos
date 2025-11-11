@@ -18,14 +18,14 @@ public abstract class Animal
     public Guid IdRegistration { get; set; } 
 
     [Required]
-    public required int IdRanch { get; set; }
+    public required Guid IdRanch { get; set; }
     public Ranch? Ranch { get; set; } 
 
-    public int? IdBreed { get; set; }
+    public Guid? IdBreed { get; set; }
     public Breed? Breed { get; set; }
     
     [Required]
-    public int IdSpecie { get; set; }
+    public Guid IdSpecie { get; set; }
     public Specie? Specie { get; set; }
 
     public AnimalGender Gender { get; set; } 
@@ -33,7 +33,7 @@ public abstract class Animal
     public int Age { get; set; }
 
     public decimal Weight { get; set; }
-    protected Animal(int idSpecie)
+    protected Animal(Guid idSpecie)
     {
         IdSpecie = idSpecie;
     }

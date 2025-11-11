@@ -8,24 +8,15 @@ namespace Persistence.Persistence.EntityConfigurations.Taxonomy
     {
         public void Configure(EntityTypeBuilder<Specie> builder)
         {
-            builder.ToTable("Species");
-
             builder.HasKey(s => s.Id);
 
-            builder.Property(s => s.CommonName)
+            builder.Property(s => s.Name)
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(s => s.ScientificName)
-                .HasMaxLength(150)
-                .IsRequired();
-            builder.HasIndex(s => s.ScientificName)
-                .IsUnique();
-
-
-            builder.HasMany(specie => specie.Breeds)
-                .WithOne(breed => breed.Specie)
-                .HasForeignKey(breed => breed.SpecieId);
+            builder.HasMany(s => s.Breeds)
+                .WithOne(b => b.Specie)
+                .HasForeignKey(b => b.SpecieId);
         }
     }
 }

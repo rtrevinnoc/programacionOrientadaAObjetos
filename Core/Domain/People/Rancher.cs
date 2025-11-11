@@ -1,38 +1,42 @@
 using System;
-using Microsoft.AspNetCore.Identity;
-using System.Diagnostics.CodeAnalysis;
-using Core.Domain.Locations;
 using System.Collections.Generic;
+using Core.Domain.Locations;
+using Microsoft.AspNetCore.Identity; // <-- AÑADE ESTE 'USING'
 
 namespace Core.Domain.People
 {
     public class Rancher
     {
-        public List<Ranch> Ranches { get; set; } = new();
-        public Guid Id { get; set; }
-        public required string Name { get; set; }
-        public required string Username { get; set; }
-        public required string PasswordHash { get; set; }
-
-        public Rancher() {}
-
-        [SetsRequiredMembers]
-        public Rancher(Guid id, string name, string username, string password)
+        public Rancher(string name, string username, string plainPassword)
         {
-            if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("El password no puede estar vacio.");
-
-            Id = id;
+            Id = Guid.NewGuid();
+            
             Name = name;
             Username = username;
             
-            var hasher = new PasswordHasher<Rancher>();
-            PasswordHash = hasher.HashPassword(this, password);
+            Password = new PasswordHasher<Rancher>().HashPassword(this, plainPassword);
+
+            Ranches = new List<Ranch>();
         }
+
+        public Rancher()
+        {
+            Name = null!;
+            Username = null!;
+            Password = null!;
+            
+            Ranches = new List<Ranch>();
+        }
+
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public List<Ranch> Ranches { get; set; }
 
         public PasswordVerificationResult SignIn(PasswordHasher<object> hasher, string providedPassword)
         {
-            return hasher.VerifyHashedPassword(this, this.PasswordHash, providedPassword);
+            return hasher.VerifyHashedPassword(this, Password, providedPassword);
         }
     }
 }

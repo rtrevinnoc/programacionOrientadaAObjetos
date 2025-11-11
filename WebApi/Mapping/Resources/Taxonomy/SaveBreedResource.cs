@@ -12,6 +12,6 @@ namespace WebApi.Mapping.Resources.Taxonomy
         public string? Description { get; set; }
 
         [Required]
-        public int SpecieId { get; set; }
+        public Guid SpecieId { get; set; }
     }
 }
