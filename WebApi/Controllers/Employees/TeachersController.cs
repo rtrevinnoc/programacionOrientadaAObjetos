@@ -3,12 +3,16 @@ using AutoMapper;
 using Core;
 using Core.Domain.Documents;
 using Core.Domain.Employees;
+using Core.Domain.Management;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Persistence.Persistence;
 using WebApi.Mapping.Resources.Documents;
 using WebApi.Mapping.Resources.Employees;
+using WebApi.Mapping.Resources.Management;
+using WebApi.Models.Helpers.Http;
 using SystemClaim = System.Security.Claims.ClaimTypes;
 
 namespace WebApi.Controllers.Employees;
@@ -20,7 +24,7 @@ public class TeachersController : ControllerBase
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-
+    private readonly PasswordHasher<object> _hasher;
 
     public TeachersController(
         ProgramacionOrientadaAObjetosContext programacionOrientadaAObjetosContext,
@@ -29,6 +33,7 @@ public class TeachersController : ControllerBase
     {
         _unitOfWork = new UnitOfWork(programacionOrientadaAObjetosContext);
         _mapper = mapper;
+        _hasher = new PasswordHasher<object>();
     }
 
     #region CRUD
@@ -70,12 +75,18 @@ public class TeachersController : ControllerBase
 
     [HttpPost]
     [EnableQuery]
+    [Authorize]
     public async Task<IActionResult> CreateTeacher([FromBody] SaveTeacherResource saveTeacherResource)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
-        var teacher = _mapper.Map<SaveTeacherResource, Teacher>(saveTeacherResource);
+        var teacher = manager.CreateTeacher(Guid.NewGuid(), saveTeacherResource.Name);
 
         _unitOfWork.Teachers.Add(teacher);
 
@@ -88,82 +99,99 @@ public class TeachersController : ControllerBase
         return Ok(resource);
     }
 
-    // [HttpPut]
-    // [EnableQuery]
-    // public IActionResult UpdateEmployee([FromBody] SaveEmployeeResource saveEmployeeResource)
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
+    [HttpPut]
+    [EnableQuery]
+    [Authorize]
+    public IActionResult UpdateTeacher([FromBody] SaveTeacherResource saveTeacherResource)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
-    //     var employee = _unitOfWork.Employees.Get(saveEmployeeResource.Id);
-    //     if (employee == null)
-    //         return NotFound();
+        var teacher = _unitOfWork.Teachers.Get(saveTeacherResource.Id);
+        if (teacher == null)
+            return NotFound();
 
-    //     _mapper.Map(saveEmployeeResource, employee);
+        _mapper.Map(saveTeacherResource, teacher);
 
-    //     _unitOfWork.Complete();
+        _unitOfWork.Complete();
 
-    //     employee = _unitOfWork.Employees.Get(employee.Id);
+        teacher = _unitOfWork.Teachers.Get(teacher.Id);
 
-    //     var resource = _mapper.Map<Employee, EmployeeResource>(employee!);
+        var resource = _mapper.Map<Teacher, TeacherResource>(teacher!);
 
-    //     return Ok(resource);
-    // }
+        return Ok(resource);
+    }
 
-    // [HttpDelete("{id}")]
-    // [EnableQuery]
-    // public IActionResult DeleteEmployee(string id)
-    // {
-    //     var employee = _unitOfWork.Employees.Get(id);
-    //     if (employee == null)
-    //         return NotFound();
+    [HttpDelete("{id}")]
+    [EnableQuery]
+    [Authorize]
+    public IActionResult DeleteTeacher(string id)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+            
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
-    //     _unitOfWork.Employees.Remove(employee);
+        var teacher = _unitOfWork.Teachers.Get(id);
+        if (teacher == null)
+            return NotFound();
 
-    //     _unitOfWork.Complete();
+        _unitOfWork.Teachers.Remove(teacher);
 
-    //     return Ok();
-    // }
+        _unitOfWork.Complete();
+
+        return Ok();
+    }
 
     #endregion
 
     #region Schedule
 
-    // [HttpPut("{id}/Document")]
-    // [EnableQuery]
-    // public IActionResult UploadDocument(string id, IFormFile file)
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
+    [HttpPut("{id}/Schedule")]
+    [EnableQuery]
+    [Authorize]
+    public async Task<IActionResult> AssignScheduleAsync(Guid id, [FromBody] SaveScheduleResource saveScheduleResource)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-    //     var employee = _unitOfWork.Employees.Get(id);
-    //     if (employee == null)
-    //         return NotFound();
+        var httpBasicAuth = new HttpBasicAuth(HttpContext);
+        var manager = _unitOfWork.Managers.GetManagerByUsername(httpBasicAuth.UserName);
+        if (manager.SignIn(_hasher, httpBasicAuth.Password) != PasswordVerificationResult.Success)
+            return Unauthorized();
 
-    //     Document document = new Document
-    //     {
-    //         Id = Guid.NewGuid(),
-    //         OwnerId = employee.Id,
-    //         MimeType = file.ContentType,
-    //         Name = file.FileName
-    //     };
-    //     // document.Content =
+        var teacher = _unitOfWork.Teachers.Get(id);
+        if (teacher == null)
+            return NotFound("Teacher not found");
 
-    //     using (var ms = new MemoryStream())
-    //     {
-    //         file.CopyTo(ms);
-    //         document.Content = ms.ToArray();
-    //     }
+        var course = _unitOfWork.Courses.Get(saveScheduleResource.CourseId);
+        if (course == null)
+            return NotFound("Course not found");
 
-    //     _unitOfWork.Documents.Add(document);
-    //     _unitOfWork.Complete();
+        var classroom = _unitOfWork.Classrooms.Get(saveScheduleResource.ClassroomId);
+        if (classroom == null)
+            return NotFound("Classroom not found");
 
-    //     document = _unitOfWork.Documents.Get(document.Id);
+        var schedule = manager.AssignCourseToTeacher(teacher, course, classroom, saveScheduleResource.Duration);
 
-    //     var resource = _mapper.Map<Document, DocumentResource>(document);
+        _unitOfWork.Schedules.Add(schedule);
 
-    //     return Ok(resource);
-    // }
+        await _unitOfWork.CompleteAsync();
+
+        schedule = await _unitOfWork.Schedules.GetAsync(schedule.Id);
+
+        var resource = _mapper.Map<Schedule, ScheduleResource>(schedule!);
+
+        return Ok(resource);
+    }
 
     #endregion
 

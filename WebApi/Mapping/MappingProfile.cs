@@ -4,6 +4,8 @@ using WebApi.Mapping.Resources.Employees;
 using Core.Domain.Employees;
 using Core.Domain.Documents;
 using WebApi.Mapping.Resources.Documents;
+using WebApi.Mapping.Resources.Management;
+using Core.Domain.Management;
 
 namespace WebApi.Mapping
 {
@@ -21,6 +23,10 @@ namespace WebApi.Mapping
             CreateMap<Teacher, TeacherResource>();
             CreateMap<SaveTeacherResource, Teacher>();
 
+            CreateMap<Manager, ManagerResource>();
+            CreateMap<SaveManagerResource, Manager>();
+            CreateMap<SaveManagerResource, Employee>();
+
             #endregion
 
             #region Documents
@@ -28,6 +34,21 @@ namespace WebApi.Mapping
             CreateMap<Document, DocumentResource>();
             CreateMap<SaveDocumentResource, Document>();
 
+            #endregion
+
+            #region Management
+            CreateMap<Schedule, ScheduleResource>();
+            CreateMap<SaveScheduleResource, Schedule>()
+                .ForMember(d => d.Duration, o => o.MapFrom(o => TimeSpan.FromSeconds(o.Duration)));
+
+            CreateMap<Course, CourseResource>();
+            CreateMap<SaveCourseResource, Course>();
+
+            CreateMap<Classroom, ClassroomResource>();
+            CreateMap<SaveClassroomResource, Classroom>();
+
+            CreateMap<Llave, LlaveResource>();
+            CreateMap<SaveLlaveResource, Llave>();
             #endregion
 
             #endregion

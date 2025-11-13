@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Persistence;
 
@@ -10,9 +11,11 @@ using Persistence.Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ProgramacionOrientadaAObjetosContext))]
-    partial class ProgramacionOrientadaAObjetosContextModelSnapshot : ModelSnapshot
+    [Migration("20251015021350_AddSchedulesAndCourses")]
+    partial class AddSchedulesAndCourses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,20 +79,6 @@ namespace Persistence.Migrations
                     b.UseTptMappingStrategy();
                 });
 
-            modelBuilder.Entity("Core.Domain.Management.Classroom", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Classrooms", (string)null);
-                });
-
             modelBuilder.Entity("Core.Domain.Management.Course", b =>
                 {
                     b.Property<Guid>("Id")
@@ -102,42 +91,13 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Courses", (string)null);
-                });
-
-            modelBuilder.Entity("Core.Domain.Management.Llave", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("ClassroomId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid?>("PrefectId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassroomId")
-                        .IsUnique();
-
-                    b.HasIndex("PrefectId");
-
-                    b.ToTable("Llaves", (string)null);
+                    b.ToTable("Course");
                 });
 
             modelBuilder.Entity("Core.Domain.Management.Schedule", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("ClassroomId")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid>("CourseId")
@@ -151,35 +111,11 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClassroomId");
-
                     b.HasIndex("CourseId");
 
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Schedule");
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Manager", b =>
-                {
-                    b.HasBaseType("Core.Domain.Employees.Employee");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.ToTable("Managers", (string)null);
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Prefect", b =>
-                {
-                    b.HasBaseType("Core.Domain.Employees.Employee");
-
-                    b.ToTable("Prefect");
                 });
 
             modelBuilder.Entity("Core.Domain.Employees.Teacher", b =>
@@ -200,31 +136,8 @@ namespace Persistence.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Core.Domain.Management.Llave", b =>
-                {
-                    b.HasOne("Core.Domain.Management.Classroom", "Classroom")
-                        .WithOne("Llave")
-                        .HasForeignKey("Core.Domain.Management.Llave", "ClassroomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Employees.Prefect", "Prefect")
-                        .WithMany("LLaves")
-                        .HasForeignKey("PrefectId");
-
-                    b.Navigation("Classroom");
-
-                    b.Navigation("Prefect");
-                });
-
             modelBuilder.Entity("Core.Domain.Management.Schedule", b =>
                 {
-                    b.HasOne("Core.Domain.Management.Classroom", "Classroom")
-                        .WithMany("Schedules")
-                        .HasForeignKey("ClassroomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Core.Domain.Management.Course", "Course")
                         .WithMany("Schedules")
                         .HasForeignKey("CourseId")
@@ -237,29 +150,9 @@ namespace Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Classroom");
-
                     b.Navigation("Course");
 
                     b.Navigation("Teacher");
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Manager", b =>
-                {
-                    b.HasOne("Core.Domain.Employees.Employee", null)
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Employees.Manager", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Prefect", b =>
-                {
-                    b.HasOne("Core.Domain.Employees.Employee", null)
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Employees.Prefect", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Employees.Teacher", b =>
@@ -276,22 +169,9 @@ namespace Persistence.Migrations
                     b.Navigation("Documents");
                 });
 
-            modelBuilder.Entity("Core.Domain.Management.Classroom", b =>
-                {
-                    b.Navigation("Llave")
-                        .IsRequired();
-
-                    b.Navigation("Schedules");
-                });
-
             modelBuilder.Entity("Core.Domain.Management.Course", b =>
                 {
                     b.Navigation("Schedules");
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Prefect", b =>
-                {
-                    b.Navigation("LLaves");
                 });
 
             modelBuilder.Entity("Core.Domain.Employees.Teacher", b =>

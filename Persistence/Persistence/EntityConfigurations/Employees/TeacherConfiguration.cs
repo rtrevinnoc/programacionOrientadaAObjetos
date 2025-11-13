@@ -10,6 +10,10 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Core.Domain.Employe
 {
     public void Configure(EntityTypeBuilder<Core.Domain.Employees.Teacher> builder)
     {
-        builder.ToTable("Teacher");
+        builder.HasMany(c => c.Schedules)
+            .WithOne(c => c.Teacher)
+            .HasForeignKey(c => c.TeacherId);
+
+        builder.ToTable("Teachers");
     }
 }

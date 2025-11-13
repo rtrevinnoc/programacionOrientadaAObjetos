@@ -1,12 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
 using Core.Domain.Documents;
 
 namespace Core.Domain.Employees;
 
 public class Employee
 {
+    public Employee()
+    {
+        Documents = new List<Document>();
+    }
+
     public required Guid Id { get; set; }
     public required string Name { get; set; }
     public string? Sexo { get; set; }
@@ -14,12 +20,4 @@ public class Employee
     public int? TelefonoCasa { get; set; }
     public string? Correo { get; set; }
     public List<Document> Documents { get; set; }
-    public virtual EmployeeType EmployeeType { get; set; }
-}
-
-public enum EmployeeType
-{
-    Teacher,
-    Prefect,
-    Manager
 }

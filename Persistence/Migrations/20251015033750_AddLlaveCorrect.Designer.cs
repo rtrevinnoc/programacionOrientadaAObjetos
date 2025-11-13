@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Persistence;
 
@@ -10,9 +11,11 @@ using Persistence.Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ProgramacionOrientadaAObjetosContext))]
-    partial class ProgramacionOrientadaAObjetosContextModelSnapshot : ModelSnapshot
+    [Migration("20251015033750_AddLlaveCorrect")]
+    partial class AddLlaveCorrect
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,7 +90,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Classrooms", (string)null);
+                    b.ToTable("Classroom");
                 });
 
             modelBuilder.Entity("Core.Domain.Management.Course", b =>
@@ -102,7 +105,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Courses", (string)null);
+                    b.ToTable("Course");
                 });
 
             modelBuilder.Entity("Core.Domain.Management.Llave", b =>
@@ -118,7 +121,7 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<Guid?>("PrefectId")
+                    b.Property<Guid>("PrefectId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
@@ -128,7 +131,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("PrefectId");
 
-                    b.ToTable("Llaves", (string)null);
+                    b.ToTable("Llave");
                 });
 
             modelBuilder.Entity("Core.Domain.Management.Schedule", b =>
@@ -158,21 +161,6 @@ namespace Persistence.Migrations
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Schedule");
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Manager", b =>
-                {
-                    b.HasBaseType("Core.Domain.Employees.Employee");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.ToTable("Managers", (string)null);
                 });
 
             modelBuilder.Entity("Core.Domain.Employees.Prefect", b =>
@@ -210,7 +198,9 @@ namespace Persistence.Migrations
 
                     b.HasOne("Core.Domain.Employees.Prefect", "Prefect")
                         .WithMany("LLaves")
-                        .HasForeignKey("PrefectId");
+                        .HasForeignKey("PrefectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Classroom");
 
@@ -242,24 +232,6 @@ namespace Persistence.Migrations
                     b.Navigation("Course");
 
                     b.Navigation("Teacher");
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Manager", b =>
-                {
-                    b.HasOne("Core.Domain.Employees.Employee", null)
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Employees.Manager", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Domain.Employees.Prefect", b =>
-                {
-                    b.HasOne("Core.Domain.Employees.Employee", null)
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Employees.Prefect", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Employees.Teacher", b =>
